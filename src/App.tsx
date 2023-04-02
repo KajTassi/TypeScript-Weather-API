@@ -1,4 +1,32 @@
-const App = () => {
+import { ChangeEvent, useState } from "react"
+//JSX.Element is what we are going to be returning
+const App = (): JSX.Element => {
+//http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
+const [term, setTerm] = useState<string>('')
+const [options, setOptions] = useState<[]>([])
+
+const getSearchOptions = (value: string) => {
+//everything after q= are query params
+//the 5 in the url represents the limit of responses returned
+fetch(
+  `http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${
+    process.env.REACT_APP_API_KEY
+  }`
+)
+.then((res) => res.json())
+.then((data) => console.log({ data }))
+}
+//trim() removes spaces from the ends of a word, so it is neccessary for two letter search params
+const onInputChange = (e: 
+  ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value.trim()
+  setTerm(value)
+  
+  if (value === "") return
+
+  getSearchOptions(value)
+}
+
   return (
     <main className="flex justify-center items-center bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
 
@@ -13,14 +41,27 @@ const App = () => {
         Enter below a place you to know the weather of and select an option from the dropdown search function.   
       </p> 
 
-        <input 
-        type="text"
-        value={''}
-        className="px-2 py-1 rounded-1-md border-2 border-white"
-        />
+        <div className="flex mt-10 md:mt-4">
+          <input 
+          type="text"
+          value={term}
+          className="px-2 py-1 rounded-1-md border-2 border-white"
+          onChange={onInputChange}
+          />
 
-        
+          <ul className="absolute top-9 bg-white m1-1 rounded-b-md">
+          {options.map((option: { name: string }) => (
+            <p>{option.name}</p>
+          ))}
+          </ul>
 
+
+          <button className="rounded-r-md border-2 border-zinc-100
+          hover:border-zinc-500 hover:text-zinc-500 text-zinc-100
+          px-2 py-1 cursor-pointer">
+            search
+          </button>
+        </div>
       </section>
 
     </main>
