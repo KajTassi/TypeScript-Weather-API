@@ -1,21 +1,25 @@
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useState, useEffect } from "react"
+import Search from "./search"
+import { optionType } from "./types"
 //JSX.Element is what we are going to be returning
 const App = (): JSX.Element => {
 //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
 const [term, setTerm] = useState<string>('')
+const[city, setCity] = useState<optionType | null>(null)
 const [options, setOptions] = useState<[]>([])
 
-const getSearchOptions = (value: string) => {
 //everything after q= are query params
 //the 5 in the url represents the limit of responses returned
+const getSearchOptions = (value: string) => {
 fetch(
   `http://api.openweathermap.org/geo/1.0/direct?q=${value.trim()}&limit=5&appid=${
     process.env.REACT_APP_API_KEY
   }`
 )
 .then((res) => res.json())
-.then((data) => console.log({ data }))
+.then((data) => setOptions(data))
 }
+
 //trim() removes spaces from the ends of a word, so it is neccessary for two letter search params
 const onInputChange = (e: 
   ChangeEvent<HTMLInputElement>) => {
@@ -27,42 +31,44 @@ const onInputChange = (e:
   getSearchOptions(value)
 }
 
+const getForecast = (city: optionType) => {
+  fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&exclude={part}&units=metric&appid=${process.env.REACT_APP_API_KEY}`
+  )
+  .then((res) => res.json())
+  .then((data)=> setForecast(data))
+}
+
+const onSubmit = () => {
+  if (!city) return 
+
+  getForecast(city)
+}
+
+
+//https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}
+const onOptionSelect = (option: optionType) => {
+  setCity(option)
+}
+
+//this useEffect gets rid of other options after a city.name has been selected
+useEffect(() => {
+if (city) {
+  setTerm(city.name)
+  setOptions([])
+}
+}, [city])
+
   return (
-    <main className="flex justify-center items-center bg-gradient-to-br from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
+    <main className="flex justify-center items-center bg-gradient-to-br 
+    from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
 
-      <section className="w-full md:max-w-[500px] p-4 flex flex-col text-center items-center justify-center md:px-10 
-      lg:p-24 h-full lg:h-[500] bg-white bg-opacity-20 backdrop-blur-lg drop-shadow-lg rounded text-zinc-700">
-
-      <h1 className="text-4x1 font-thin">
-        Weather <span className="font-black">Forecast</span>
-      </h1> 
-
-      <p className="text-sm mt-2">
-        Enter below a place you to know the weather of and select an option from the dropdown search function.   
-      </p> 
-
-        <div className="flex mt-10 md:mt-4">
-          <input 
-          type="text"
-          value={term}
-          className="px-2 py-1 rounded-1-md border-2 border-white"
-          onChange={onInputChange}
-          />
-
-          <ul className="absolute top-9 bg-white m1-1 rounded-b-md">
-          {options.map((option: { name: string }) => (
-            <p>{option.name}</p>
-          ))}
-          </ul>
-
-
-          <button className="rounded-r-md border-2 border-zinc-100
-          hover:border-zinc-500 hover:text-zinc-500 text-zinc-100
-          px-2 py-1 cursor-pointer">
-            search
-          </button>
-        </div>
-      </section>
+      <Search 
+      term={term}
+      options={options}
+      onInputChange={onInputChange}
+      onOptionSelect={onOptionSelect}
+      onSubmit={onSubmit}
+      />
 
     </main>
   )
@@ -71,5 +77,7 @@ const onInputChange = (e:
 //Notes on tailwind CSS
 //md: max-w-[500px] means 500 max width with a medium screen
 //zing-"number" is the intensity of the color
+
+//if there is a problem with the search bar, go back to minute 56 on the video
 
 export default App
