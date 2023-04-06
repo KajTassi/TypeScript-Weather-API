@@ -1,5 +1,7 @@
 import { ChangeEvent, useState, useEffect } from "react"
+
 import Search from "./search"
+
 import { optionType } from "./types"
 //JSX.Element is what we are going to be returning
 const App = (): JSX.Element => {
@@ -7,6 +9,7 @@ const App = (): JSX.Element => {
 const [term, setTerm] = useState<string>('')
 const[city, setCity] = useState<optionType | null>(null)
 const [options, setOptions] = useState<[]>([])
+const [forecast, setForecast] = useState< null>(null)
 
 //everything after q= are query params
 //the 5 in the url represents the limit of responses returned
@@ -61,6 +64,8 @@ if (city) {
   return (
     <main className="flex justify-center items-center bg-gradient-to-br 
     from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
+
+    
 
       <Search 
       term={term}
