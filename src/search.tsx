@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react"
-import { optionType } from "./types"
+import { optionType } from "./types" 
 
 type Props= {
     term: string
@@ -47,7 +47,6 @@ const Search = ({
                 {option.name}
               </button>
             </li>
-
           ))}
           </ul>
 
@@ -65,6 +64,7 @@ const Search = ({
     </main>
   )
 }
+
 
 //Notes on tailwind CSS
 //md: max-w-[500px] means 500 max width with a medium screen

@@ -1,6 +1,7 @@
 
 
 import useForecast from "./hooks/useForecast"
+import Forecast from "./components/Icons/Forecast"
 import Search from "./search"
 
 //JSX.Element is what we are going to be returning
@@ -20,7 +21,7 @@ const {
     from-sky-400 via-rose-400 to-lime-400 h-[100vh] w-full">
 
     {forecast ? (
-      "we have a forecast"
+      <Forecast data={forecast} />
     ) : (
       <Search 
       term={term}
